@@ -24,10 +24,10 @@ $fontSize: 37.5;
 }
 
 .slide-up-enter, .slide-up-leave-to {
-  transform: translate3d(0, 100%, 0);
+  transform: translate3d(0, px2rem(108), 0);
 }
 
-.slide-down-enter-to, .slide-down-leave,.slide-up-enter-to,.slide-up-leave{
+.slide-down-enter-to, .slide-down-leave, .slide-up-enter-to, .slide-up-leave {
   transform: translate3d(0, 0, 0);
 }
 
