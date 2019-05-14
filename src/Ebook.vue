@@ -9,7 +9,14 @@
         <div class="right" @click="nextPage"></div>
       </div>
     </div>
-    <menu-bar :isMenuShow='isMenuShow' ref="menuBar" :fontSizeList="fontSizeList"/>
+    <menu-bar :isMenuShow='isMenuShow'
+              ref="menuBar"
+              :fontSizeList="fontSizeList"
+              :defaultFontSize="defaultFontSize"
+              @changeFontSize="changeFontSize"
+              :themeList="themeList"
+              :defaultTheme="defaultTheme"
+              @setTheme="setTheme"/>
   </div>
 </template>
 
@@ -32,7 +39,44 @@ export default {
         { fontSize: '20px' },
         { fontSize: '22px' },
         { fontSize: '24px' }
-      ]
+      ],
+      defaultFontSize: '16px',
+      themeList: [
+        {
+          name: 'default',
+          style: {
+            body: {
+              color: '#000',
+              background: '#fff'
+            }
+          }
+        }, {
+          name: 'eye',
+          style: {
+            body: {
+              color: '#000',
+              background: '#ceeaba'
+            }
+          }
+        }, {
+          name: 'night',
+          style: {
+            body: {
+              color: '#fff',
+              background: '#000'
+            }
+          }
+        }, {
+          name: 'gold',
+          style: {
+            body: {
+              color: '#000',
+              background: 'rgb(241, 236, 226)'
+            }
+          }
+        }
+      ],
+      defaultTheme: 0
     }
   },
   components: {
@@ -51,6 +95,10 @@ export default {
       })
       // 通过Rendition.display渲染电子书
       this.rendition.display()
+      this.themes = this.rendition.themes
+      this.changeFontSize(this.defaultFontSize)
+      this.registerTheme()
+      this.setTheme(this.defaultTheme)
     },
     prevPage () {
       if (this.rendition) {
@@ -67,6 +115,23 @@ export default {
       if (!this.isMenuShow) {
         this.$refs.menuBar.hiddenFontSizeControl()
       }
+    },
+    changeFontSize (fontSize) {
+      this.defaultFontSize = fontSize
+      if (this.themes) {
+        this.themes.fontSize(fontSize)
+      }
+    },
+    // 注册主题
+    registerTheme () {
+      this.themeList.forEach(theme => {
+        this.themes.register(theme.name, theme.style)
+      })
+    },
+    // 设置主题
+    setTheme (index) {
+      this.themes.select(this.themeList[index].name)
+      this.defaultTheme = index
     }
   },
   mounted () {
