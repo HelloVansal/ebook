@@ -16,7 +16,11 @@
               @changeFontSize="changeFontSize"
               :themeList="themeList"
               :defaultTheme="defaultTheme"
-              @setTheme="setTheme"/>
+              @setTheme="setTheme"
+              :bookAvailable="bookAvailable"
+              @onProgressChange="onProgressChange"
+              @jumpTo="jumpTo"
+              :navigation="navigation"/>
   </div>
 </template>
 
@@ -76,7 +80,10 @@ export default {
           }
         }
       ],
-      defaultTheme: 0
+      defaultTheme: 0,
+      // 图书是否处于可用状态
+      bookAvailable: false,
+      navigation: {}
     }
   },
   components: {
@@ -84,6 +91,17 @@ export default {
     MenuBar
   },
   methods: {
+    // 根据链接跳转到指定目录
+    jumpTo (href) {
+      this.rendition.display(href)
+      this.menuToggle()
+    },
+    // progress值为0-100
+    onProgressChange (progress) {
+      const precentage = progress / 100
+      const location = precentage > 0 ? this.location.cfiFromPercentage(precentage) : 0
+      this.rendition.display(location)
+    },
     // 电子书解析和渲染
     showEpub () {
       // 生成Ebook
@@ -99,6 +117,15 @@ export default {
       this.changeFontSize(this.defaultFontSize)
       this.registerTheme()
       this.setTheme(this.defaultTheme)
+      // 获取location对象来实现阅读进度功能
+      this.book.ready.then(() => {
+        this.navigation = this.book.navigation
+        console.log(this.navigation)
+        return this.book.locations.generate()
+      }).then(result => {
+        this.location = this.book.locations
+        this.bookAvailable = true
+      })
     },
     prevPage () {
       if (this.rendition) {
